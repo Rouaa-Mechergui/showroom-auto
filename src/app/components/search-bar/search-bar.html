@@ -1,0 +1,142 @@
+<section class="showroom-section">
+  <div class="search-panel">
+    <div class="search-form-card">
+      <div class="search-header">
+        <div class="search-icon-badge">
+          <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+        </div>
+        <div>
+          <h2 class="search-title">Rechercher un Véhicule</h2>
+          <p class="search-desc">Filtrez les modèles disponibles par constructeur</p>
+        </div>
+      </div>
+
+      <div class="search-controls">
+        <div class="input-wrapper">
+          <label for="brandInput" class="input-label">Marque :</label>
+          <div class="input-field-group">
+            <input 
+              id="brandInput"
+              type="text" 
+              class="brand-input"
+              placeholder="Ex: BMW, Audi, Mercedes, Jaguar..."
+              [(ngModel)]="searchBrand"
+              (input)="searchAutoList()"
+              (keyup.enter)="searchAutoList()"
+            />
+            <button 
+              *ngIf="searchBrand" 
+              class="btn-clear" 
+              (click)="resetSearch()" 
+              title="Effacer la recherche">
+              <fa-icon [icon]="faRotateLeft"></fa-icon>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-search" (click)="searchAutoList()">
+          <fa-icon [icon]="faMagnifyingGlass"></fa-icon>
+          <span>Rechercher</span>
+        </button>
+      </div>
+
+      <div class="quick-filters">
+        <span class="quick-filter-label">Filtres rapides :</span>
+        <div class="brand-chips">
+          <button 
+            *ngFor="let brand of availableBrands"
+            class="chip-btn"
+            [class.active]="(brand === 'Toutes' && !searchBrand) || (searchBrand.toLowerCase() === brand.toLowerCase())"
+            (click)="filterByBrand(brand)">
+            {{ brand }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="results-header">
+    <div class="results-count">
+      <fa-icon [icon]="faCar" class="count-icon"></fa-icon>
+      <span>
+        <strong>{{ selectedAutos.length }}</strong> 
+        {{ selectedAutos.length > 1 ? 'modèles trouvés' : 'modèle trouvé' }}
+      </span>
+      <span *ngIf="searchBrand" class="filter-badge">
+        pour "{{ searchBrand }}"
+      </span>
+    </div>
+
+    <button *ngIf="searchBrand" class="btn-reset-text" (click)="resetSearch()">
+      Afficher tous les modèles
+    </button>
+  </div>
+
+
+  <div class="cars-grid" *ngIf="selectedAutos.length > 0">
+    <div 
+      class="auto-card" 
+      *ngFor="let auto of selectedAutos"
+      [class.selected-card]="auto.id === currentSelectedId">
+      
+
+      <div class="card-image-wrapper">
+        <img 
+          [src]="'photos/' + auto.photo" 
+          [alt]="auto.brand + ' ' + auto.model"
+          class="card-image"
+          loading="lazy"
+        />
+        <div class="brand-tag">{{ auto.brand }}</div>
+        <div class="availability-badge" [class.low-stock]="auto.availability <= 3">
+          {{ auto.availability }} en stock
+        </div>
+      </div>
+
+      <!-- Contenu de la carte -->
+      <div class="card-body">
+        <h3 class="model-title">{{ auto.model }}</h3>
+        <p class="brand-subtitle">{{ auto.brand }}</p>
+
+        <div class="specs-mini">
+          <div class="spec-mini-item" title="Puissance fiscale">
+            <fa-icon [icon]="faGaugeHigh" class="spec-icon"></fa-icon>
+            <span>{{ auto.power }} CV</span>
+          </div>
+          <div class="spec-mini-item" title="Unités disponibles">
+            <fa-icon [icon]="faWarehouse" class="spec-icon"></fa-icon>
+            <span>{{ auto.availability }} dispo</span>
+          </div>
+        </div>
+
+        <div class="card-footer">
+          <div class="price-box">
+            <span class="price-label">Prix</span>
+            <span class="price-value">{{ auto.price }} <small>DNT</small></span>
+          </div>
+
+          <!-- Bouton pour voir les détails -->
+          <button 
+            class="btn-view" 
+            (click)="selectedAuto(auto)"
+            [class.btn-view-active]="auto.id === currentSelectedId"
+            title="Afficher les détails de ce modèle">
+            <fa-icon [icon]="faEye"></fa-icon>
+            <span>Voir détails</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- État vide si aucune voiture ne correspond -->
+  <div class="empty-state" *ngIf="selectedAutos.length === 0">
+    <div class="empty-icon">🔍</div>
+    <h3>Aucun modèle trouvé</h3>
+    <p>Aucun véhicule ne correspond à la marque "<strong>{{ searchBrand }}</strong>".</p>
+    <button class="btn-search" (click)="resetSearch()">
+      Réinitialiser et voir toutes les voitures
+    </button>
+  </div>
+</section>
